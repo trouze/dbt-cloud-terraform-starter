@@ -50,9 +50,9 @@ jobs:
         if: github.ref == 'refs/heads/main'
         run: terraform apply -auto-approve tfplan
         env:
-          TF_VAR_dbt_account_id: ${{ secrets.TF_VAR_dbt_account_id }}
-          TF_VAR_dbt_token: ${{ secrets.TF_VAR_dbt_token }}
-          TF_VAR_dbt_host_url: ${{ secrets.TF_VAR_dbt_host_url }}
+          TF_VAR_dbt_account_id: ${{ secrets.TF_VAR_DBT_ACCOUNT_ID }}
+          TF_VAR_dbt_token: ${{ secrets.TF_VAR_DBT_TOKEN }}
+          TF_VAR_dbt_host_url: ${{ secrets.TF_VAR_DBT_HOST_URL }}
 
       - name: Encrypt Artifact & Upload Encrypted Artifact
         uses: badgerhobbs/terraform-state@v2
