@@ -23,5 +23,3 @@ RUN wget https://github.com/dbt-labs/dbtcloud-terraforming/releases/download/v${
 
 # Verify installation
 RUN terraform --version && dbtcloud-terraforming version
-
-RUN chmod +x .devcontainer/startup.sh
