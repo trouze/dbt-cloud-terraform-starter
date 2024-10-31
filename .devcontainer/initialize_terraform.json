@@ -14,7 +14,7 @@
             "description": "Create an encryption key to store terraform state (use `openssl rand -base64 32` in terminal to create)."
         }
     },
-    "name": "dbt Cloud Terraform Starter",
+    "name": "dbt Cloud Terraform Starter Codespace",
     "dockerFile": "Dockerfile",
     "settings": {
         "files.associations": {
@@ -26,6 +26,5 @@
         "memory": "4gb",
         "storage": "32gb"
     },
-    "postStartCommand": "chmod +x .devcontainer/startup.sh",
-    "postAttachCommand": "/bin/bash .devcontainer/startup.sh"
+    "postStartCommand": ["chmod +x .devcontainer/initialize_startup.sh","/bin/bash .devcontainer/initialize_startup.sh"]
 }
