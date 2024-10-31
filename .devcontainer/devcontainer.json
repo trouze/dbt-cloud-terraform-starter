@@ -26,5 +26,5 @@
         "memory": "4gb",
         "storage": "32gb"
     },
-    "postAttachCommand": ["chmod +x .devcontainer/initialize_startup.sh","/bin/bash .devcontainer/initialize_startup.sh"]
+    "postStartCommand": "/bin/bash .devcontainer/initialize_startup.sh"
 }
