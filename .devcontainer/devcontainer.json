@@ -26,5 +26,5 @@
         "memory": "4gb",
         "storage": "32gb"
     },
-    "postStartCommand": "/bin/sh startup.sh"
+    "postStartCommand": "/bin/sh scripts/startup.sh"
 }
