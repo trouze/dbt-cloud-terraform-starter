@@ -26,5 +26,5 @@
         "memory": "4gb",
         "storage": "32gb"
     },
-    "postStartCommand": ["chmod +x .devcontainer/maintain_startup.sh","/bin/bash .devcontainer/maintain_startup.sh"]
+    "postStartCommand": ["chmod +x .devcontainer/maintain/maintain_startup.sh","/bin/bash .devcontainer/maintain/maintain_startup.sh"]
 }
