@@ -1,13 +1,13 @@
 # Use a lightweight base image
 FROM ubuntu:latest
-COPY . .
+
 # Set environment variables
 ENV TERRAFORM_VERSION=1.5.7
 ENV DBTCLOUDTF_VERSION=0.8.0
 
 # Install dependencies
 RUN apt-get update && \
-    apt-get install -y wget unzip && \
+    apt-get install -y wget unzip git && \
     rm -rf /var/lib/apt/lists/*
 
 # Download and install Terraform
@@ -23,3 +23,5 @@ RUN wget https://github.com/dbt-labs/dbtcloud-terraforming/releases/download/v${
 
 # Verify installation
 RUN terraform --version && dbtcloud-terraforming version
+
+RUN chmod +x .devcontainer/startup.sh
