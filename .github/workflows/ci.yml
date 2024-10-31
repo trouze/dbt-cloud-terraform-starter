@@ -2,6 +2,9 @@ name: Validate Terraform Changes
 
 on:
   # pull_request:
+  #   paths-ignore:
+  #     - "**.tfstate"
+  #     - "**tfstate.encrypted"
   #   branches:
   #     - main
   workflow_dispatch:
@@ -11,26 +14,35 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-    - name: Check out the repository
-      uses: actions/checkout@v3
+      - name: Check out the repository
+        uses: actions/checkout@v4
 
-    - name: Set up Terraform
-      uses: hashicorp/setup-terraform@v2
-      with:
-        terraform_version: 1.5.0  # Specify your Terraform version
+      - name: Download Encrypted Artifact & Decrypt
+        uses: badgerhobbs/terraform-state@v2
+        with:
+          encryption_key: ${{ secrets.AES_256_ENCRYPTION_KEY }}
+          operation: download
+          location: artifact
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+        continue-on-error: true
 
-    - name: Check Terraform Format
-      run: terraform fmt -check -recursive
+      - name: Set up Terraform
+        uses: hashicorp/setup-terraform@v3
+        with:
+          terraform_version: 1.5.0  # Specify your Terraform version
 
-    - name: Terraform Init
-      run: terraform init
+      - name: Check Terraform Format
+        run: terraform fmt -check -recursive
 
-    - name: Validate Terraform
-      run: terraform validate
+      - name: Terraform Init
+        run: terraform init
 
-    - name: Terraform Plan
-      run: terraform plan
-      env:
-        TF_VAR_dbt_account_id: ${{ secrets.TF_VAR_dbt_account_id }}
-        TF_VAR_dbt_token: ${{ secrets.TF_VAR_dbt_token }}
-        TF_VAR_dbt_host_url: ${{ secrets.TF_VAR_dbt_host_url }}
+      - name: Validate Terraform
+        run: terraform validate
+
+      - name: Terraform Plan
+        run: terraform plan
+        env:
+          TF_VAR_dbt_account_id: ${{ secrets.TF_VAR_dbt_account_id }}
+          TF_VAR_dbt_token: ${{ secrets.TF_VAR_dbt_token }}
+          TF_VAR_dbt_host_url: ${{ secrets.TF_VAR_dbt_host_url }}

@@ -8,7 +8,10 @@
             "documentationUrl": "https://docs.getdbt.com/docs/dbt-cloud-apis/service-tokens"
         },
         "TF_VAR_dbt_host_url": {
-            "description": "dbt Cloud API host URL (default https://cloud.getdbt.com/api"
+            "description": "dbt Cloud API host URL (commonly https://cloud.getdbt.com/api)"
+        },
+        "AES_256_ENCRYPTION_KEY": {
+            "description": "Create an encryption key to store terraform state (use `openssl rand -base64 32` in terminal to create)."
         }
     },
     "name": "dbt Cloud Terraform Starter",

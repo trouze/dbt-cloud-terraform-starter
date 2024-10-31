@@ -2,34 +2,62 @@ name: Deploy Terraform Changes
 
 on:
   # push:
+  #   paths-ignore:
+  #     - "**.tfstate"
+  #     - "**tfstate.encrypted"
   #   branches:
   #     - main
   workflow_dispatch:
+
+permissions:
+  contents: read
+  actions: write # require to upload artifacts
+
+concurrency:
+  group: terraform-deploy
+  cancel-in-progress: false
 
 jobs:
   terraform:
     runs-on: ubuntu-latest
 
     steps:
-    - name: Check out the repository
-      uses: actions/checkout@v3
+      - name: Check out the repository
+        uses: actions/checkout@v4
 
-    - name: Set up Terraform
-      uses: hashicorp/setup-terraform@v2
-      with:
-        terraform_version: 1.5.0  # Specify your Terraform version
+      - name: Download Encrypted Artifact & Decrypt
+        uses: badgerhobbs/terraform-state@v2
+        with:
+          encryption_key: ${{ secrets.AES_256_ENCRYPTION_KEY }}
+          operation: download
+          location: artifact
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+        continue-on-error: true
 
-    - name: Terraform Init
-      run: terraform init
+      - name: Set up Terraform
+        uses: hashicorp/setup-terraform@v3
+        with:
+          terraform_version: 1.5.0  # Specify your Terraform version
 
-    - name: Terraform Plan
-      id: plan
-      run: terraform plan -out=tfplan
+      - name: Terraform Init
+        run: terraform init
 
-    - name: Apply Terraform Changes
-      if: github.ref == 'refs/heads/main'
-      run: terraform apply -auto-approve tfplan
-      env:
-        TF_VAR_dbt_account_id: ${{ secrets.TF_VAR_dbt_account_id }}
-        TF_VAR_dbt_token: ${{ secrets.TF_VAR_dbt_token }}
-        TF_VAR_dbt_host_url: ${{ secrets.TF_VAR_dbt_host_url }}
+      - name: Terraform Plan
+        id: plan
+        run: terraform plan -out=tfplan
+
+      - name: Apply Terraform Changes
+        if: github.ref == 'refs/heads/main'
+        run: terraform apply -auto-approve tfplan
+        env:
+          TF_VAR_dbt_account_id: ${{ secrets.TF_VAR_dbt_account_id }}
+          TF_VAR_dbt_token: ${{ secrets.TF_VAR_dbt_token }}
+          TF_VAR_dbt_host_url: ${{ secrets.TF_VAR_dbt_host_url }}
+
+      - name: Encrypt Artifact & Upload Encrypted Artifact
+        uses: badgerhobbs/terraform-state@v2
+        with:
+          encryption_key: ${{ secrets.AES_256_ENCRYPTION_KEY }}
+          operation: upload
+          location: artifact
+          github_token: ${{ secrets.GITHUB_TOKEN }}
