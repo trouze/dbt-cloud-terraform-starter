@@ -21,18 +21,10 @@
             "*.tf": "hcl"
         }
     },
-    "features": {
-        "docker-in-docker": {
-            "version": "latest",
-            "moby": true,
-            "dockerDashComposeVersion": "v1"
-        }
-    },
     "hostRequirements": {
         "cpus": 2,
         "memory": "4gb",
         "storage": "32gb"
     },
-    "onCreateCommand": "",
     "postStartCommand": "/bin/sh startup.sh"
 }
