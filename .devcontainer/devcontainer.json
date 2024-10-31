@@ -12,9 +12,6 @@
         }
     },
     "name": "dbt Cloud Terraform Starter",
-    "extensions": [
-        "innoverio.vscode-dbt-power-user"
-    ],
     "dockerFile": "Dockerfile",
     "settings": {
         "files.associations": {

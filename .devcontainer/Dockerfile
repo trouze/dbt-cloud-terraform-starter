@@ -23,6 +23,3 @@ RUN wget https://github.com/dbt-labs/dbtcloud-terraforming/releases/download/v${
 
 # Verify installation
 RUN terraform --version && dbtcloud-terraforming version
-
-# Set default command
-CMD ["terraform", "--help"]
