@@ -1,9 +1,10 @@
 name: Validate Terraform Changes
 
 on:
-  pull_request:
-    branches:
-      - main  # Run on pull requests targeting the main branch
+  # pull_request:
+  #   branches:
+  #     - main
+  workflow_dispatch:
 
 jobs:
   terraform-validate:

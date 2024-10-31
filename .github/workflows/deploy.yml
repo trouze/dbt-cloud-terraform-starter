@@ -1,9 +1,10 @@
 name: Deploy Terraform Changes
 
 on:
-  push:
-    branches:
-      - main  # Trigger this action only on pushes to the main branch
+  # push:
+  #   branches:
+  #     - main
+  workflow_dispatch:
 
 jobs:
   terraform:
