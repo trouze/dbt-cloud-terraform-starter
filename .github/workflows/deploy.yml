@@ -2,9 +2,6 @@ name: Deploy Terraform Changes
 
 on:
   # push:
-  #   paths-ignore:
-  #     - "**.tfstate"
-  #     - "**tfstate.encrypted"
   #   branches:
   #     - main
   workflow_dispatch:
