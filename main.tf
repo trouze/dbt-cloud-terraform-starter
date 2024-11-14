@@ -25,3 +25,11 @@ provider "dbtcloud" {
   token      = var.dbt_token
   host_url   = var.dbt_host_url
 }
+
+module "account" {
+  source = "./dbt_cloud/account"
+}
+
+module "project" {
+  source = "./dbt_cloud/projects"
+}

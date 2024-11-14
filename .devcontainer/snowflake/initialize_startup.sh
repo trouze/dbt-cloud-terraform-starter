@@ -10,7 +10,7 @@ terraform init
 dbtcloud-terraforming -a ${TF_VAR_dbt_account_id} -t ${TF_VAR_dbt_token} --host-url ${TF_VAR_dbt_host_url} generate --resource-types dbtcloud_global_connection > dbt_cloud/account/main.tf 2>&1
 
 # write dbtcloud_databricks_credential to account_credentials.tf and link to 
-dbtcloud-terraforming -a ${TF_VAR_dbt_account_id} -t ${TF_VAR_dbt_token} --host-url ${TF_VAR_dbt_host_url} generate --resource-types dbtcloud_databricks_credential --linked-resource-types dbtcloud_project >> dbt_cloud/account/main.tf 2>&1
+dbtcloud-terraforming -a ${TF_VAR_dbt_account_id} -t ${TF_VAR_dbt_token} --host-url ${TF_VAR_dbt_host_url} generate --resource-types dbtcloud_snowflake_credential --linked-resource-types dbtcloud_project >> dbt_cloud/account/main.tf 2>&1
 
 # write dbtcloud_repository to account_repositories.tf linked to project
 dbtcloud-terraforming -a ${TF_VAR_dbt_account_id} -t ${TF_VAR_dbt_token} --host-url ${TF_VAR_dbt_host_url} generate --resource-types dbtcloud_repository --linked-resource-types dbtcloud_project >> dbt_cloud/account/main.tf 2>&1
