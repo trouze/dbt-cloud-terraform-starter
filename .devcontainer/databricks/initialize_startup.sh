@@ -6,6 +6,7 @@ export TF_VAR_dbt_project_id=$TF_VAR_DBT_PROJECT_ID
 
 git remote add origin https://github.com/${GITHUB_REPOSITORY}.git
 git fetch --unshallow && git pull origin main
+git rebase origin/main
 
 # initialize terraform
 terraform init
