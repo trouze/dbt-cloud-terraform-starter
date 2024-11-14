@@ -74,7 +74,8 @@ jobs:
         run: terraform plan -out=tfplan_${{ matrix.module }} -target=module.${{ matrix.module }}
 
       - name: Apply Terraform Changes
-        if: github.ref == 'refs/heads/main' && contains(fromJSON(needs.changes.outputs.modules), matrix.module)
+        # if: github.ref == 'refs/heads/main' && contains(fromJSON(needs.changes.outputs.modules), matrix.module)
+        if: false
         run: terraform apply -auto-approve tfplan_${{ matrix.module }}
         env:
           TF_VAR_dbt_account_id: ${{ secrets.TF_VAR_DBT_ACCOUNT_ID }}
