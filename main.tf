@@ -30,6 +30,6 @@ module "account" {
   source = "./dbt_cloud/account"
 }
 
-module "project" {
-  source = "./dbt_cloud/projects"
+module "initial_project" {
+  source = "./dbt_cloud/projects/initial"
 }

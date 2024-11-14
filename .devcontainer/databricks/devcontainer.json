@@ -3,6 +3,9 @@
         "TF_VAR_dbt_account_id": {
             "description": "dbt Cloud Account ID (can be found in Account Settings)"
         },
+        "TF_VAR_dbt_project_id": {
+            "description": "dbt Cloud project ID for resources you'd like to retrieve"
+        },
         "TF_VAR_dbt_token": {
             "description": "dbt Cloud API token secret needed to authenticate into the service.",
             "documentationUrl": "https://docs.getdbt.com/docs/dbt-cloud-apis/service-tokens"
