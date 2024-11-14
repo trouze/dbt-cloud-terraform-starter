@@ -5,6 +5,7 @@ provider "registry.terraform.io/dbt-labs/dbtcloud" {
   version     = "0.3.19"
   constraints = "~> 0.3"
   hashes = [
+    "h1:5/IIoHguvTYqCw3HGYCO0XBWztiMNRStTpP1M744iVU=",
     "h1:C6JiWkbDNmoUvMzCpKCKcO+vJ6fYvRtWu+UhMN7PK5E=",
     "zh:053fde1b2f6f389458649df4947dd8a0ebd456a6f6aa5643f3ceb563b54cdeab",
     "zh:228e8483025874bed2bfd54f3fa22b8bb537f4dd41840ef7025119d74d1d6b4f",
