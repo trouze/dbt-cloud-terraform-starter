@@ -4,6 +4,7 @@ export TF_VAR_dbt_token=$TF_VAR_DBT_TOKEN
 export TF_VAR_dbt_host_url=$TF_VAR_DBT_HOST_URL
 
 git remote add origin https://github.com/${GITHUB_REPOSITORY}.git
+git fetch --unshallow && git pull origin main
 
 # initialize terraform
 terraform init
