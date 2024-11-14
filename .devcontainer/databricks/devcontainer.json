@@ -26,5 +26,5 @@
         "memory": "4gb",
         "storage": "32gb"
     },
-    "postStartCommand": "/bin/bash .devcontainer/initialize_startup.sh"
+    "postStartCommand": "/bin/bash .devcontainer/databricks/initialize_startup.sh"
 }
