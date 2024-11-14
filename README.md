@@ -1,9 +1,7 @@
 # Preamble
 
-<aside>
-🗣 Audience: Anyone that works on a platform team implementing data mesh patterns
 
-</aside>
+> 🗣 Audience: Anyone that works on a platform team implementing data mesh patterns
 
 dbt Cloud is changing every day to add functionality to enable data teams to better deliver value to the enterprise. One of our biggest releases in the past year has been the addition of features supporting a data mesh architecture (what we call the dbt Mesh). We see many customers come to us hoping to implement patterns that come from this architecture, but it commonly means a lot of setup (i.e. “clickops”) within our application to get going. This is because successful mesh implementations usually rely upon a “platform” team or architect that sets standards that each team should adhere to within their dbt project. In practice, this means you need to setup at least 3 jobs in dbt Cloud for each project (deploy, CI, merge), which can mean a lot of clicking to create something that is pretty identical for each project. So, our solution to this could include the use of an IaC (infrastructure-as-code) tool.
 
