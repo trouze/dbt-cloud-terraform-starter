@@ -12,6 +12,9 @@ project:
       connection_id: 207456
       deployment_type: production
       type: deployment
+      dbt_version: latest
+      enable_model_query_history: false
+      custom_branch: main
       jobs:
         - name: Daily Job
           execute_steps:
@@ -21,6 +24,26 @@ project:
             git_provider_webhook: false
             schedule: false
             on_merge: false
+          dbt_version: latest
+          deferring_environment_id: 207456
+          deferring_job_id: 207456
+          description: some description
+          errors_on_lint_failure: true
+          generate_docs: true
+          is_active: true
+          num_threads: 4
+          run_compare_changes: true
+          run_generate_sources: true
+          run_lint: true
+          schedule_cron: "0 0 * * *"
+          schedule_days: [0, 1, 2, 3, 4, 5, 6]
+          schedule_hours: [0, 8, 18]
+          schedule_interval: 5
+          schedule_type: days_of_week
+          self_deferring: true
+          target_name: prod
+          timeout_seconds: 3600
+          triggers_on_draft_pr: true
         - name: Ad-hoc job
           execute_steps:
             - dbt parse

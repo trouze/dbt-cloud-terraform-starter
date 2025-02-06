@@ -1,140 +1,237 @@
 {
-    "$schema": "https://json-schema.org/draft/2020-12/schema",
-    "$id": "https://example.com/project.schema.json",
-    "title": "Project Configuration Schema",
-    "description": "Schema for project configuration",
-    "type": "object",
-    "properties": {
-      "project": {
-        "type": "object",
-        "properties": {
-          "name": {
-            "description": "Name of the project",
-            "type": "string"
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://example.com/project.schema.json",
+  "title": "Project Configuration Schema",
+  "description": "Schema for project configuration",
+  "type": "object",
+  "properties": {
+    "project": {
+      "type": "object",
+      "properties": {
+        "name": {
+          "description": "Name of the project",
+          "type": "string"
+        },
+        "repository": {
+          "type": "object",
+          "properties": {
+            "remote_url": {
+              "description": "Remote URL of the repository",
+              "type": "string",
+              "pattern": "^git@[^:]+:[^/]+/[^/]+$"
+            },
+            "gitlab_project_id": {
+              "description": "GitLab project ID",
+              "type": "integer"
+            }
           },
-          "repository": {
+          "required": ["remote_url", "gitlab_project_id"]
+        },
+        "environments": {
+          "description": "List of environments",
+          "type": "array",
+          "items": {
             "type": "object",
             "properties": {
-              "remote_url": {
-                "description": "Remote URL of the repository",
-                "type": "string",
-                "pattern": "^git@[^:]+:[^/]+/[^/]+$"
+              "name": {
+                "description": "Name of the environment",
+                "type": "string"
               },
-              "gitlab_project_id": {
-                "description": "GitLab project ID",
-                "type": "integer"
-              }
-            },
-            "required": ["remote_url", "gitlab_project_id"]
-          },
-          "environments": {
-            "description": "List of environments",
-            "type": "array",
-            "items": {
-              "type": "object",
-              "properties": {
-                "name": {
-                  "description": "Name of the environment",
-                  "type": "string"
-                },
-                "credential": {
-                  "type": "object",
-                  "properties": {
-                    "token_name": {
-                      "description": "Name of the token",
-                      "type": "string"
-                    },
-                    "schema": {
-                      "description": "Schema name",
-                      "type": "string"
-                    }
+              "credential": {
+                "type": "object",
+                "properties": {
+                  "token_name": {
+                    "description": "Name of the token",
+                    "type": "string"
                   },
-                  "required": ["token_name", "schema"]
-                },
-                "connection_id": {
-                  "description": "Connection ID",
-                  "type": "integer"
-                },
-                "deployment_type": {
-                  "description": "Type of deployment",
-                  "type": ["string", "null"]
-                },
-                "type": {
-                  "description": "Type of environment",
-                  "type": "string",
-                  "enum": ["deployment", "development"]
-                },
-                "jobs": {
-                  "description": "List of jobs",
-                  "type": "array",
-                  "items": {
-                    "type": "object",
-                    "properties": {
-                      "name": {
-                        "description": "Name of the job",
-                        "type": "string"
-                      },
-                      "execute_steps": {
-                        "description": "Steps to execute",
-                        "type": "array",
-                        "items": {
-                          "type": "string"
-                        }
-                      },
-                      "triggers": {
-                        "type": "object",
-                        "properties": {
-                          "github_webhook": {
-                            "description": "GitHub webhook trigger",
-                            "type": "boolean"
-                          },
-                          "git_provider_webhook": {
-                            "description": "Git provider webhook trigger",
-                            "type": "boolean"
-                          },
-                          "schedule": {
-                            "description": "Scheduled trigger",
-                            "type": "boolean"
-                          },
-                          "on_merge": {
-                            "description": "Trigger on merge",
-                            "type": "boolean"
-                          }
-                        },
-                        "required": ["github_webhook", "git_provider_webhook", "schedule", "on_merge"]
-                      }
-                    },
-                    "required": ["name", "execute_steps", "triggers"]
-                  }
-                }
-              },
-              "required": ["name", "type"]
-            }
-          },
-          "environment_variables": {
-            "description": "List of environment variables",
-            "type": "array",
-            "items": {
-              "type": "object",
-              "properties": {
-                "name": {
-                  "description": "Name of the variable",
-                  "type": "string"
-                },
-                "environment_values": {
-                  "type": "object",
-                  "additionalProperties": {
+                  "schema": {
+                    "description": "Schema name",
                     "type": "string"
                   }
-                }
+                },
+                "required": ["token_name", "schema"]
               },
-              "required": ["name", "environment_values"]
-            }
+              "connection_id": {
+                "description": "Connection ID",
+                "type": "integer"
+              },
+              "deployment_type": {
+                "description": "Type of deployment",
+                "type": ["string", "null"]
+              },
+              "type": {
+                "description": "Type of environment",
+                "type": "string",
+                "enum": ["deployment", "development"]
+              },
+              "dbt_version": {
+                "description": "DBT version",
+                "type": ["string", "null"]
+              },
+              "enable_model_query_history": {
+                "description": "Enable model query history",
+                "type": ["boolean", "null"]
+              },
+              "custom_branch": {
+                "description": "Custom branch",
+                "type": ["string", "null"]
+              },
+              "jobs": {
+                "description": "List of jobs",
+                "type": "array",
+                "items": {
+                  "type": "object",
+                  "properties": {
+                    "name": {
+                      "description": "Name of the job",
+                      "type": "string"
+                    },
+                    "execute_steps": {
+                      "description": "Steps to execute",
+                      "type": "array",
+                      "items": {
+                        "type": "string"
+                      }
+                    },
+                    "triggers": {
+                      "type": "object",
+                      "properties": {
+                        "github_webhook": {
+                          "description": "GitHub webhook trigger",
+                          "type": "boolean"
+                        },
+                        "git_provider_webhook": {
+                          "description": "Git provider webhook trigger",
+                          "type": "boolean"
+                        },
+                        "schedule": {
+                          "description": "Scheduled trigger",
+                          "type": "boolean"
+                        },
+                        "on_merge": {
+                          "description": "Trigger on merge",
+                          "type": "boolean"
+                        }
+                      },
+                      "required": ["github_webhook", "git_provider_webhook", "schedule", "on_merge"]
+                    },
+                    "dbt_version": {
+                      "description": "DBT version for the job",
+                      "type": ["string", "null"]
+                    },
+                    "deferring_environment_id": {
+                      "description": "Deferring environment ID",
+                      "type": ["integer", "null"]
+                    },
+                    "deferring_job_id": {
+                      "description": "Deferring job ID",
+                      "type": ["integer", "null"]
+                    },
+                    "description": {
+                      "description": "Job description",
+                      "type": ["string", "null"]
+                    },
+                    "errors_on_lint_failure": {
+                      "description": "Errors on lint failure",
+                      "type": ["boolean", "null"]
+                    },
+                    "generate_docs": {
+                      "description": "Generate documentation",
+                      "type": ["boolean", "null"]
+                    },
+                    "is_active": {
+                      "description": "Is the job active",
+                      "type": ["boolean", "null"]
+                    },
+                    "num_threads": {
+                      "description": "Number of threads",
+                      "type": ["integer", "null"]
+                    },
+                    "run_compare_changes": {
+                      "description": "Run compare changes",
+                      "type": ["boolean", "null"]
+                    },
+                    "run_generate_sources": {
+                      "description": "Run generate sources",
+                      "type": ["boolean", "null"]
+                    },
+                    "run_lint": {
+                      "description": "Run lint",
+                      "type": ["boolean", "null"]
+                    },
+                    "schedule_cron": {
+                      "description": "Schedule cron expression",
+                      "type": ["string", "null"]
+                    },
+                    "schedule_days": {
+                      "description": "Schedule days of the week",
+                      "type": ["array", "null"],
+                      "items": {
+                        "type": "integer"
+                      }
+                    },
+                    "schedule_hours": {
+                      "description": "Schedule hours of the day",
+                      "type": ["array", "null"],
+                      "items": {
+                        "type": "integer"
+                      }
+                    },
+                    "schedule_interval": {
+                      "description": "Schedule interval",
+                      "type": ["integer", "null"]
+                    },
+                    "schedule_type": {
+                      "description": "Schedule type",
+                      "type": ["string", "null"]
+                    },
+                    "self_deferring": {
+                      "description": "Self-deferring",
+                      "type": ["boolean", "null"]
+                    },
+                    "target_name": {
+                      "description": "Target name",
+                      "type": ["string", "null"]
+                    },
+                    "timeout_seconds": {
+                      "description": "Timeout in seconds",
+                      "type": ["integer", "null"]
+                    },
+                    "triggers_on_draft_pr": {
+                      "description": "Triggers on draft PR",
+                      "type": ["boolean", "null"]
+                    }
+                  },
+                  "required": ["name", "execute_steps", "triggers"]
+                }
+              }
+            },
+            "required": ["name", "type"]
           }
         },
-        "required": ["name", "repository", "environments", "environment_variables"]
-      }
-    },
-    "required": ["project"]
-  }
-  
+        "environment_variables": {
+          "description": "List of environment variables",
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "name": {
+                "description": "Name of the variable",
+                "type": "string"
+              },
+              "environment_values": {
+                "type": "object",
+                "additionalProperties": {
+                  "type": "string"
+                }
+              }
+            },
+            "required": ["name", "environment_values"]
+          }
+        }
+      },
+      "required": ["name", "repository", "environments", "environment_variables"]
+    }
+  },
+  "required": ["project"]
+}
