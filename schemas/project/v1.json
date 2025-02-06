@@ -18,7 +18,7 @@
               "remote_url": {
                 "description": "Remote URL of the repository",
                 "type": "string",
-                "format": "uri"
+                "pattern": "^git@[^:]+:[^/]+/[^/]+$"
               },
               "gitlab_project_id": {
                 "description": "GitLab project ID",

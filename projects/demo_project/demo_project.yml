@@ -1,8 +1,8 @@
-# yaml-language-server: $schema=https://example.com/your-schema.json
+# yaml-language-server: $schema=https://raw.githubusercontent.com/trouze/dbt-cloud-terraform-starter/refs/heads/main/schemas/project/v1.json
 project:
   name: tyler tf test project
   repository:
-    remote_url: 'git@github.com:trouze/adi-domain-jaffle.git'
+    remote_url: "git@github.com:trouze/adi-domain-jaffle.git"
     gitlab_project_id: 267820
   environments:
     - name: Production Environment
