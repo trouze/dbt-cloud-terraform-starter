@@ -26,3 +26,10 @@ To use, go ahead and copy this template repository to your organization and star
 Upon merge, a deployment action will run that updates the infrastructure and stores the state in a Github artifact. 
 
 Disclaimer: This template repo gives you some tools to manage Terraform state from entirely within Github, this likely isn't a best practice for your organization as you should probably use an external tool to do this like Terraform Cloud or an external storage bucket. In this implementation, we make use of Github Artifacts which are usually limited to 90 days of storage if they go untouched. To emulate state locking in other solutions, we prevent concurrent builds from ocurring via a configuration in the deployment action, but this probably isn't as full featured as another solution.
+
+
+## Improvements coming
+1. Automated way to pull down existing dbt Cloud resources into HCL using dbtcloud-terraforming
+2. Use `hcl2json` to convert these blocks into json
+3. Then convert json into yaml, align to schema.
+4. Project -> [Repository, Environments -> [Credentials, Jobs], Environment Variables]

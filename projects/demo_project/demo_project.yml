@@ -1,3 +1,4 @@
+# yaml-language-server: $schema=https://example.com/your-schema.json
 project:
   name: tyler tf test project
   repository:

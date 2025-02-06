@@ -1,0 +1,140 @@
+{
+    "$schema": "https://json-schema.org/draft/2020-12/schema",
+    "$id": "https://example.com/project.schema.json",
+    "title": "Project Configuration Schema",
+    "description": "Schema for project configuration",
+    "type": "object",
+    "properties": {
+      "project": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "description": "Name of the project",
+            "type": "string"
+          },
+          "repository": {
+            "type": "object",
+            "properties": {
+              "remote_url": {
+                "description": "Remote URL of the repository",
+                "type": "string",
+                "format": "uri"
+              },
+              "gitlab_project_id": {
+                "description": "GitLab project ID",
+                "type": "integer"
+              }
+            },
+            "required": ["remote_url", "gitlab_project_id"]
+          },
+          "environments": {
+            "description": "List of environments",
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "name": {
+                  "description": "Name of the environment",
+                  "type": "string"
+                },
+                "credential": {
+                  "type": "object",
+                  "properties": {
+                    "token_name": {
+                      "description": "Name of the token",
+                      "type": "string"
+                    },
+                    "schema": {
+                      "description": "Schema name",
+                      "type": "string"
+                    }
+                  },
+                  "required": ["token_name", "schema"]
+                },
+                "connection_id": {
+                  "description": "Connection ID",
+                  "type": "integer"
+                },
+                "deployment_type": {
+                  "description": "Type of deployment",
+                  "type": ["string", "null"]
+                },
+                "type": {
+                  "description": "Type of environment",
+                  "type": "string",
+                  "enum": ["deployment", "development"]
+                },
+                "jobs": {
+                  "description": "List of jobs",
+                  "type": "array",
+                  "items": {
+                    "type": "object",
+                    "properties": {
+                      "name": {
+                        "description": "Name of the job",
+                        "type": "string"
+                      },
+                      "execute_steps": {
+                        "description": "Steps to execute",
+                        "type": "array",
+                        "items": {
+                          "type": "string"
+                        }
+                      },
+                      "triggers": {
+                        "type": "object",
+                        "properties": {
+                          "github_webhook": {
+                            "description": "GitHub webhook trigger",
+                            "type": "boolean"
+                          },
+                          "git_provider_webhook": {
+                            "description": "Git provider webhook trigger",
+                            "type": "boolean"
+                          },
+                          "schedule": {
+                            "description": "Scheduled trigger",
+                            "type": "boolean"
+                          },
+                          "on_merge": {
+                            "description": "Trigger on merge",
+                            "type": "boolean"
+                          }
+                        },
+                        "required": ["github_webhook", "git_provider_webhook", "schedule", "on_merge"]
+                      }
+                    },
+                    "required": ["name", "execute_steps", "triggers"]
+                  }
+                }
+              },
+              "required": ["name", "type"]
+            }
+          },
+          "environment_variables": {
+            "description": "List of environment variables",
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "name": {
+                  "description": "Name of the variable",
+                  "type": "string"
+                },
+                "environment_values": {
+                  "type": "object",
+                  "additionalProperties": {
+                    "type": "string"
+                  }
+                }
+              },
+              "required": ["name", "environment_values"]
+            }
+          }
+        },
+        "required": ["name", "repository", "environments", "environment_variables"]
+      }
+    },
+    "required": ["project"]
+  }
+  
