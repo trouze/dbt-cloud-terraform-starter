@@ -52,7 +52,6 @@ project:
             git_provider_webhook: false
             schedule: false
             on_merge: false
-          something_that_does_not_exist: true
     - name: Development Environment
       connection_id: 207456
       type: development

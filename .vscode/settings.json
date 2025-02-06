@@ -1,0 +1,6 @@
+{
+    "yaml.schemas": {
+      "https://raw.githubusercontent.com/trouze/dbt-cloud-terraform-starter/refs/heads/main/schemas/project/v1.json": "*.yaml"
+    }
+  }
+  
