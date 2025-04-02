@@ -10,8 +10,11 @@ variable "environment_ids" {
 
 variable "environment_variables" {
   description = "A list of environment variable configurations"
-  type = list(object({
-    name              = string
-    environment_values = map(string)
-  }))
+  type = any
+}
+
+variable "token_map" {
+    type = map(string)
+    description = "Mapping of token names to credential"
+    sensitive = true
 }
