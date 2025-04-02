@@ -14,5 +14,6 @@ resource "dbtcloud_databricks_credential" "databricks_credential" {
   project_id = var.project_id
   token      = lookup(var.token_map, each.value.credential.token_name, null)
   schema     = each.value.credential.schema
+  catalog    = each.value.credential.catalog
   adapter_type = "databricks"
 }
