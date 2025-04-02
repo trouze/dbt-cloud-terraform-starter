@@ -12,7 +12,11 @@ resource "dbtcloud_environment_variable" "environment_variables" {
     env_var.name => env_var
   }
 
-  name = each.value.name
-  project_id = var.project_id
-  environment_values = each.value.environment_values
+  name           = each.value.name
+  project_id     = var.project_id
+  environment_values = {
+    for key, value in each.value.environment_values :
+    key => startswith(value, "secret_") ? lookup(var.token_map, join("_", slice(split("_", value), 1, length(split("_", value)))), null) : value
+  }
 }
+
