@@ -1,0 +1,204 @@
+###############################################
+#              Terraform in CICD              #
+###############################################
+
+#
+# Terraform Config + Init -> Validate -> Plan -> Apply -> Destroy
+#
+.rules_template:
+  rules:
+    # update to $CI_DEFAULT_BRANCH
+    - if: '$CI_PIPELINE_SOURCE == "merge_request_event" && $CI_MERGE_REQUEST_TARGET_BRANCH_NAME == "main-tyler"'
+      changes:
+        - deploy/terraform/dbtcloud-kv271-70403103916054/projects/$PROJECT_NAME/*
+
+# extend this for every new project under terraform management
+.matrix-dbt-projects:
+  parallel:
+    matrix:
+      - PROJECT_NAME: finance-training-sandbox
+      - PROJECT_NAME: it-edp
+      - PROJECT_NAME: scm-inventory-insights
+      - PROJECT_NAME: it-shared-datasets
+
+.tf-base:
+  image: registry.gitlab.com/gitlab-org/terraform-images/releases/1.5:v1.5.1
+  services: []
+  cache:
+    key: ${CACHE_KEY}-main-${PROJECT_NAME}
+    paths:
+      - ${CI_PROJECT_DIR}/${TF_ROOT}/projects/${PROJECT_NAME}/${TF_STATE_FILE}.tfstate
+  before_script:
+    - cd ${CI_PROJECT_DIR}/${TF_ROOT}
+
+
+.tf-dbtcloud-kv271-70403103916054:
+  environment:
+    name: kv271-70403103916054
+  variables:
+    REFRESH_MODE: "apply"
+    TF_VAR_dbt_account_id: 70403103916054
+    TF_VAR_dbt_token: $dbtcloud_user_api_token
+    TF_VAR_dbt_host_url: 'https://kv271.us1.dbt.com/api'
+    TF_VAR_dbt_cloud_databricks_ucnp_token: $dbtcloud_databricks_token_ucnp
+    TF_VAR_dbtcloud_databricks_token_dbt_svcprincipal_ucnp: $dbtcloud_databricks_token_dbt_svcprincipal_ucnp
+    TF_VAR_dbt_cloud_databricks_ucpr_token: $dbtcloud_databricks_token_ucpr
+    TF_VAR_dbtcloud_databricks_token_dbt_svcprincipal_ucpr: $dbtcloud_databricks_token_dbt_svcprincipal_ucpr
+    TF_VAR_install_kairos_dbt_token: $install_kairos_dbt_token
+    TF_VAR_install_sd_token: $install_sd_token
+    TF_VAR_install_i2_token: $install_i2_token
+    CACHE_KEY: kv271-70403103916054
+    TF_ADDRESS: ${CI_API_V4_URL}/projects/${CI_PROJECT_ID}/terraform/state/kv271-70403103916054
+    TF_ROOT: deploy/terraform/dbtcloud-kv271-70403103916054
+    TF_STATE_FILE: ${CACHE_KEY}-${PROJECT_NAME}
+    CI_PROJECT_DIR: /builds/kairos/cloudenvironment/awsterraform/common-platform-services/dbt-cloud-projects
+
+#
+# Define Jobs Added to GitLab CI/CD Pipeline
+#
+tf-dbtcloud-kv271-70403103916054-prepare:
+  # check that the feature branch has all main commits to prevent state drift
+  stage: prepare
+  extends:
+    - .tf-base
+    - .tf-dbtcloud-kv271-70403103916054
+  # UPDATE merge-base command to default branch
+  script:
+    - git fetch origin
+    - git checkout $CI_COMMIT_REF_NAME
+    - git pull origin $CI_COMMIT_REF_NAME
+    - git merge-base --is-ancestor origin/main-tyler HEAD
+  rules:
+    - !reference [.rules_template, rules]
+
+tf-dbtcloud-kv271-70403103916054-plan:
+  stage: plan
+  # build terraform plan for deployment during CD
+  extends:
+    - .rules_template
+    - .tf-base
+    - .tf-dbtcloud-kv271-70403103916054
+    - .matrix-dbt-projects
+  script:
+    - |
+      export TF_VAR_token_map=$(env | grep '^TF_VAR_' | awk -F= '{gsub(/^TF_VAR_/, "", $1); printf "\"%s\": \"%s\", ", $1, $2}' | sed 's/, $//')
+    - export TF_VAR_token_map="{${TF_VAR_token_map}}"
+    - terraform init
+    - terraform validate
+    - |
+      terraform plan \
+      -var="yaml_file=./projects/${PROJECT_NAME}/${PROJECT_NAME}.yml" \
+      -var="target_name=" \
+      -out=projects/${PROJECT_NAME}/${PROJECT_NAME}-${CI_COMMIT_SHA}.tfplan \
+      -state="projects/${PROJECT_NAME}/${TF_STATE_FILE}.tfstate"
+    - |
+      terraform show \
+      -json \
+      projects/${PROJECT_NAME}/${PROJECT_NAME}-${CI_COMMIT_SHA}.tfplan > projects/${PROJECT_NAME}/${PROJECT_NAME}-${CI_COMMIT_SHA}.json
+  artifacts:
+    name: ${CACHE_KEY}-${PROJECT_NAME}-${CI_COMMIT_SHA}-plan
+    paths:
+      - ${TF_ROOT}/projects/${PROJECT_NAME}/${PROJECT_NAME}-${CI_COMMIT_SHA}.tfplan
+    expire_in: 1 week
+    reports:
+      terraform: ${TF_ROOT}/projects/${PROJECT_NAME}/${PROJECT_NAME}-${CI_COMMIT_SHA}.json
+  needs: 
+    - job: tf-dbtcloud-kv271-70403103916054-prepare
+  rules:
+    - !reference [.rules_template, rules]
+
+tf-dbtcloud-kv271-70403103916054-apply-ci:
+  # deploy project to dbt Cloud in a sandbox project for validation
+  stage: build
+  when: manual
+  allow_failure: false
+  extends:
+    - .rules_template
+    - .tf-base
+    - .tf-dbtcloud-kv271-70403103916054
+    - .matrix-dbt-projects
+  script:
+    - |
+      export TF_VAR_token_map=$(env | grep '^TF_VAR_' | awk -F= '{gsub(/^TF_VAR_/, "", $1); printf "\"%s\": \"%s\", ", $1, $2}' | sed 's/, $//')
+    - export TF_VAR_token_map="{${TF_VAR_token_map}}"
+    - terraform init
+    - |
+      terraform apply \
+      -auto-approve \
+      -var="yaml_file=./projects/${PROJECT_NAME}/${PROJECT_NAME}.yml" \
+      -var="target_name=CI-validation: " \
+      -state="projects/${PROJECT_NAME}/${TF_STATE_FILE}-${CI_COMMIT_SHA}.tfstate"
+  artifacts:
+    name: ${CACHE_KEY}-${PROJECT_NAME}-${CI_COMMIT_SHA}-state
+    expire_in: 1 week
+    paths:
+      - ${TF_ROOT}/projects/${PROJECT_NAME}/${TF_STATE_FILE}-${CI_COMMIT_SHA}.tfstate
+  needs: 
+    - job: tf-dbtcloud-kv271-70403103916054-plan
+  rules:
+    - !reference [.rules_template, rules]
+
+tf-dbtcloud-kv271-70403103916054-destroy-ci:
+  # upon successful validation, allow user to destroy CI created resources
+  stage: destroy
+  when: manual
+  allow_failure: false
+  extends:
+    - .rules_template
+    - .tf-base
+    - .tf-dbtcloud-kv271-70403103916054
+    - .matrix-dbt-projects
+  dependencies:
+    - tf-dbtcloud-kv271-70403103916054-apply-ci
+  script:
+    - |
+      export TF_VAR_token_map=$(env | grep '^TF_VAR_' | awk -F= '{gsub(/^TF_VAR_/, "", $1); printf "\"%s\": \"%s\", ", $1, $2}' | sed 's/, $//')
+    - export TF_VAR_token_map="{${TF_VAR_token_map}}"
+    - terraform init
+    - |
+      terraform destroy \
+      -auto-approve \
+      -var="yaml_file=./projects/${PROJECT_NAME}/${PROJECT_NAME}.yml" \
+      -var="target_name=CI-validation: " \
+      -state="projects/${PROJECT_NAME}/${TF_STATE_FILE}-${CI_COMMIT_SHA}.tfstate"
+  needs: 
+    - job: tf-dbtcloud-kv271-70403103916054-apply-ci
+  rules:
+    - !reference [.rules_template, rules]
+
+tf-dbtcloud-kv271-70403103916054-apply:
+  stage: deploy
+  when: manual
+  allow_failure: false
+  resource_group: ${CACHE_KEY}-${PROJECT_NAME} # prevents race conditions
+  extends:
+    - .tf-base
+    - .tf-dbtcloud-kv271-70403103916054
+    - .matrix-dbt-projects
+  dependencies:
+    - tf-dbtcloud-kv271-70403103916054-plan
+  script:
+    - |
+      export TF_VAR_token_map=$(env | grep '^TF_VAR_' | awk -F= '{gsub(/^TF_VAR_/, "", $1); printf "\"%s\": \"%s\", ", $1, $2}' | sed 's/, $//')
+    - export TF_VAR_token_map="{${TF_VAR_token_map}}"
+    - terraform init
+    - |
+      if [[ "$REFRESH_MODE" = "refresh" ]]; then
+        terraform apply \
+        -auto-approve \
+        -refresh-only \
+        -state="projects/${PROJECT_NAME}/${TF_STATE_FILE}.tfstate" \
+        projects/${PROJECT_NAME}/${PROJECT_NAME}-${CI_COMMIT_SHA}.tfplan
+      else
+        terraform apply \
+        -auto-approve \
+        -state="projects/${PROJECT_NAME}/${TF_STATE_FILE}.tfstate" \
+        projects/${PROJECT_NAME}/${PROJECT_NAME}-${CI_COMMIT_SHA}.tfplan
+      fi
+  needs: 
+    - job: tf-dbtcloud-kv271-70403103916054-plan
+  rules:
+    # update to $CI_DEFAULT_BRANCH
+    - if: $CI_COMMIT_BRANCH == "main-tyler"
+      changes:
+        - "${CI_PROJECT_DIR}/${TF_ROOT}/projects/${PROJECT_NAME}/**/*"
